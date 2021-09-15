@@ -5,6 +5,7 @@ import (
 
 	"github.com/idexter/monkey/ast"
 	"github.com/idexter/monkey/lexer"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -58,4 +59,26 @@ func checkParserErrors(t *testing.T, p *Parser) {
 		t.Errorf("parser error: %q", msg)
 	}
 	t.FailNow()
+}
+
+func TestReturnStatements(t *testing.T) {
+	input := `
+   return 5;
+   return 10;
+   return 993322;
+`
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	require.NotNil(t, program, "ParseProgram() returned nil")
+	require.Len(t, program.Statements, 3, "program.Statements does not contain 3 statements.")
+
+	for _, stmt := range program.Statements {
+		returnStmt, ok := stmt.(*ast.ReturnStatement)
+		assert.True(t, ok, "stmt not *ast.ReturnStatement.")
+		assert.Equal(t, "return", returnStmt.TokenLiteral())
+	}
 }
