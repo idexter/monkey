@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/idexter/monkey/ast"
@@ -121,4 +122,38 @@ func TestIntegerLiteralExpression(t *testing.T) {
 
 	assert.Equal(t, int64(5), ident.Value, "ident.Value not %s", "5")
 	assert.Equal(t, "5", ident.TokenLiteral(), "ident.TokenLiteral not %s", "5")
+}
+
+func TestParsingPrefixExpressions(t *testing.T) {
+	prefixTests := []struct {
+		input        string
+		operator     string
+		integerValue int64
+	}{
+		{"!5;", "!", 5},
+		{"-15;", "-", 15},
+	}
+
+	for _, tt := range prefixTests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+		require.Len(t, program.Statements, 1, "program has not enough statements.")
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		require.True(t, ok, "program.Statements[0] is not ast.ExpressionStatement.")
+
+		exp, ok := stmt.Expression.(*ast.PrefixExpression)
+		require.True(t, ok, "stmt is not ast.PrefixExpression.")
+
+		assert.Equal(t, tt.operator, exp.Operator, "exp.Operator is not '%s'", tt.operator)
+		testIntegerLiteral(t, exp.Right, tt.integerValue)
+	}
+}
+
+func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) {
+	integ, ok := il.(*ast.IntegerLiteral)
+	require.True(t, ok, "il not *ast.IntegerLiteral.")
+	require.Equal(t, value, integ.Value, "integ.Value not %d.", value)
+	require.Equal(t, fmt.Sprintf("%d", value), integ.TokenLiteral(), "integ.TokenLiteral not %d.", value)
 }
