@@ -8,3 +8,4 @@ reading [Writing An Interpreter In Go](https://interpreterbook.com/).
 - [ ] Implement UTF-8 support
 - [ ] Implement float numbers
 - [ ] Implement reading code from files
+- [ ] Implement postfix expressions
