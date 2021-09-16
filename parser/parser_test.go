@@ -82,3 +82,43 @@ func TestReturnStatements(t *testing.T) {
 		assert.Equal(t, "return", returnStmt.TokenLiteral())
 	}
 }
+
+func TestIdentifierStatement(t *testing.T) {
+	input := "foobar;"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+	require.NotNil(t, program, "ParseProgram() returned nil")
+
+	require.Len(t, program.Statements, 1, "program has not enough statements.")
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	require.True(t, ok, "program.Statements[0] is not ast.ExpressionStatement.")
+
+	ident, ok := stmt.Expression.(*ast.Identifier)
+	assert.True(t, ok, "exp not *ast.Identifier.")
+
+	assert.Equal(t, "foobar", ident.Value, "ident.Value not %s", "foobar")
+	assert.Equal(t, "foobar", ident.TokenLiteral(), "ident.TokenLiteral not %s", "foobar")
+}
+
+func TestIntegerLiteralExpression(t *testing.T) {
+	input := "5;"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+	require.NotNil(t, program, "ParseProgram() returned nil")
+
+	require.Len(t, program.Statements, 1, "program has not enough statements.")
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	require.True(t, ok, "program.Statements[0] is not ast.ExpressionStatement.")
+
+	ident, ok := stmt.Expression.(*ast.IntegerLiteral)
+	assert.True(t, ok, "exp not *ast.Identifier.")
+
+	assert.Equal(t, int64(5), ident.Value, "ident.Value not %s", "5")
+	assert.Equal(t, "5", ident.TokenLiteral(), "ident.TokenLiteral not %s", "5")
+}
