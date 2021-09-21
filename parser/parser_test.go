@@ -263,3 +263,34 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		assert.Equal(t, tt.expected, actual)
 	}
 }
+
+func testIdentifier(t *testing.T, exp ast.Expression, value string) {
+	ident, ok := exp.(*ast.Identifier)
+	require.True(t, ok, "exp not *ast.Identifier.")
+	require.Equal(t, value, ident.Value, "ident.Value not %s.", value)
+	require.Equal(t, value, ident.TokenLiteral(), "ident.TokenLiteral not %s.", value)
+}
+
+func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{}) {
+	switch v := expected.(type) {
+	case int:
+		testIntegerLiteral(t, exp, int64(v))
+		return
+	case int64:
+		testIntegerLiteral(t, exp, v)
+		return
+	case string:
+		testIdentifier(t, exp, v)
+		return
+	}
+	t.Errorf("type of exp not handled. got=%T", exp)
+}
+
+func testInfixExpression(t *testing.T, exp ast.Expression, left interface{}, operator string, right interface{}) {
+	opExp, ok := exp.(*ast.InfixExpression)
+	require.True(t, ok, "exp is not ast.InfixExpression.")
+
+	testLiteralExpression(t, opExp.Left, left)
+	require.Equal(t, operator, opExp.Operator, "exp.Operator is not '%s'", operator)
+	testLiteralExpression(t, opExp.Right, right)
+}
