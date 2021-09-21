@@ -371,3 +371,64 @@ func TestBooleanExpression(t *testing.T) {
 		require.Equal(t, tt.expectedBoolean, boolean.Value, "boolean.Value not %t.", tt.expectedBoolean)
 	}
 }
+
+func TestIfExpression(t *testing.T) {
+	input := `if (x < y) { x }`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	require.Len(t, program.Statements, 1, "program.Statements does not contain %d statements.", 1)
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	require.True(t, ok, "program.Statements[0] is not ast.ExpressionStatement.")
+
+	exp, ok := stmt.Expression.(*ast.IfExpression)
+	require.True(t, ok, "stmt.Expression is not ast.IfExpression.")
+
+	testInfixExpression(t, exp.Condition, "x", "<", "y")
+
+	require.Len(t, exp.Consequence.Statements, 1, "consequence is not 1 statements.")
+
+	consequence, ok := exp.Consequence.Statements[0].(*ast.ExpressionStatement)
+	require.True(t, ok, "Statements[0] is not ast.ExpressionStatement.")
+
+	testIdentifier(t, consequence.Expression, "x")
+
+	require.Nil(t, exp.Alternative, "exp.Alternative.Statements was not nil.")
+}
+
+func TestIfElseExpression(t *testing.T) {
+	input := `if (x < y) { x } else { y }`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	require.Len(t, program.Statements, 1, "program.Statements does not contain %d statements.", 1)
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	require.True(t, ok, "program.Statements[0] is not ast.ExpressionStatement.")
+
+	exp, ok := stmt.Expression.(*ast.IfExpression)
+	require.True(t, ok, "stmt.Expression is not ast.IfExpression.")
+
+	testInfixExpression(t, exp.Condition, "x", "<", "y")
+
+	require.Len(t, exp.Consequence.Statements, 1, "consequence is not 1 statements.")
+
+	consequence, ok := exp.Consequence.Statements[0].(*ast.ExpressionStatement)
+	require.True(t, ok, "Statements[0] is not ast.ExpressionStatement.")
+
+	testIdentifier(t, consequence.Expression, "x")
+
+	require.Len(t, exp.Alternative.Statements, 1, "exp.Alternative.Statements does not contain 1 statements.")
+
+	alternative, ok := exp.Alternative.Statements[0].(*ast.ExpressionStatement)
+	require.True(t, ok, "Statements[0] is not ast.ExpressionStatement.")
+
+	testIdentifier(t, alternative.Expression, "y")
+}
