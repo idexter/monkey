@@ -128,10 +128,12 @@ func TestParsingPrefixExpressions(t *testing.T) {
 	prefixTests := []struct {
 		input        string
 		operator     string
-		integerValue int64
+		integerValue interface{}
 	}{
 		{"!5;", "!", 5},
 		{"-15;", "-", 15},
+		{"!true;", "!", true},
+		{"!false;", "!", false},
 	}
 
 	for _, tt := range prefixTests {
@@ -147,7 +149,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		require.True(t, ok, "stmt is not ast.PrefixExpression.")
 
 		assert.Equal(t, tt.operator, exp.Operator, "exp.Operator is not '%s'", tt.operator)
-		testIntegerLiteral(t, exp.Right, tt.integerValue)
+		testLiteralExpression(t, exp.Right, tt.integerValue)
 	}
 }
 
@@ -161,9 +163,9 @@ func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) {
 func TestParsingInfixExpressions(t *testing.T) {
 	infixTests := []struct {
 		input      string
-		leftValue  int64
+		leftValue  interface{}
 		operator   string
-		rightValue int64
+		rightValue interface{}
 	}{
 		{"5 + 5;", 5, "+", 5},
 		{"5 - 5;", 5, "-", 5},
@@ -173,6 +175,9 @@ func TestParsingInfixExpressions(t *testing.T) {
 		{"5 < 5;", 5, "<", 5},
 		{"5 == 5;", 5, "==", 5},
 		{"5 != 5;", 5, "!=", 5},
+		{"true == true", true, "==", true},
+		{"true != false", true, "!=", false},
+		{"false == false", false, "==", false},
 	}
 	for _, tt := range infixTests {
 		l := lexer.New(tt.input)
@@ -193,9 +198,8 @@ func TestParsingInfixExpressions(t *testing.T) {
 			t.Fatalf("exp is not ast.InfixExpression. got=%T", stmt.Expression)
 		}
 
-		testIntegerLiteral(t, exp.Left, tt.leftValue)
+		testInfixExpression(t, stmt.Expression, tt.leftValue, tt.operator, tt.rightValue)
 		require.Equal(t, tt.operator, exp.Operator, "exp.Operator is not '%s'", tt.operator)
-		testIntegerLiteral(t, exp.Right, tt.rightValue)
 	}
 }
 
@@ -252,6 +256,22 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 			"3 + 4 * 5 == 3 * 1 + 4 * 5",
 			"((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))",
 		},
+		{
+			"true",
+			"true",
+		},
+		{
+			"false",
+			"false",
+		},
+		{
+			"3 > 5 == false",
+			"((3 > 5) == false)",
+		},
+		{
+			"3 < 5 == true",
+			"((3 < 5) == true)",
+		},
 	}
 
 	for _, tt := range tests {
@@ -282,6 +302,9 @@ func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{
 	case string:
 		testIdentifier(t, exp, v)
 		return
+	case bool:
+		testBooleanLiteral(t, exp, v)
+		return
 	}
 	t.Errorf("type of exp not handled. got=%T", exp)
 }
@@ -293,4 +316,38 @@ func testInfixExpression(t *testing.T, exp ast.Expression, left interface{}, ope
 	testLiteralExpression(t, opExp.Left, left)
 	require.Equal(t, operator, opExp.Operator, "exp.Operator is not '%s'", operator)
 	testLiteralExpression(t, opExp.Right, right)
+}
+
+func testBooleanLiteral(t *testing.T, exp ast.Expression, value bool) {
+	bo, ok := exp.(*ast.Boolean)
+	require.True(t, ok, "exp not *ast.Boolean.")
+	require.Equal(t, value, bo.Value, "bo.Value not %t.", value)
+	require.Equal(t, fmt.Sprintf("%t", value), bo.TokenLiteral(), "bo.TokenLiteral not %t.", value)
+}
+
+func TestBooleanExpression(t *testing.T) {
+	tests := []struct {
+		input           string
+		expectedBoolean bool
+	}{
+		{"true;", true},
+		{"false;", false},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		require.Len(t, program.Statements, 1, "program has not enough statements.")
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		require.True(t, ok, "program.Statements[0] is not ast.ExpressionStatement.")
+
+		boolean, ok := stmt.Expression.(*ast.Boolean)
+		require.True(t, ok, "exp not *ast.Boolean.")
+
+		require.Equal(t, tt.expectedBoolean, boolean.Value, "boolean.Value not %t.", tt.expectedBoolean)
+	}
 }
