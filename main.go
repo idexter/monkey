@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/user"
 
-	"github.com/idexter/monkey/rppl"
+	"github.com/idexter/monkey/repl"
 )
 
 func main() {
@@ -15,5 +15,5 @@ func main() {
 	}
 	fmt.Printf("Hello %s! This is the Monkey programming language!\n", usr.Username)
 	fmt.Printf("Feel free to type in commands\n")
-	rppl.Start(os.Stdin, os.Stdout)
+	repl.Start(os.Stdin, os.Stdout)
 }
