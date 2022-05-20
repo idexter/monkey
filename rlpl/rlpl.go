@@ -1,4 +1,4 @@
-package repl
+package rlpl
 
 import (
 	"bufio"
@@ -11,6 +11,7 @@ import (
 
 const PROMPT = ">> "
 
+// Start implements Read-Lex-Print-Loop.
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 
