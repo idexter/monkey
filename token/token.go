@@ -6,8 +6,9 @@ const (
 
 	// Identifiers + literals
 
-	IDENT = "IDENT" // add, foobar, x, y, ...
-	INT   = "INT"   // 123456
+	IDENT  = "IDENT" // add, foobar, x, y, ...
+	INT    = "INT"   // 123456
+	STRING = "STRING"
 
 	// Operators
 
