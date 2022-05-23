@@ -1,4 +1,4 @@
-package rlpl
+package repl
 
 import (
 	"bufio"
@@ -9,10 +9,8 @@ import (
 	"github.com/idexter/monkey/token"
 )
 
-const PROMPT = ">> "
-
-// Start implements Read-Lex-Print-Loop.
-func Start(in io.Reader, out io.Writer) {
+// StartRLPL implements Read-Lex-Print-Loop.
+func StartRLPL(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 
 	for {

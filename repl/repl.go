@@ -12,8 +12,8 @@ import (
 
 const PROMPT = ">> "
 
-// Start implements Read-Parse-Print-Loop.
-func Start(in io.Reader, out io.Writer) {
+// StartREPL implements Read-Parse-Print-Loop.
+func StartREPL(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 
 	for {
