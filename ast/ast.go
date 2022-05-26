@@ -316,3 +316,12 @@ func (hl *HashLiteral) String() string {
 	out.WriteString("}")
 	return out.String()
 }
+
+type CommentLiteral struct {
+	Token token.Token
+	Value string
+}
+
+func (cm *CommentLiteral) expressionNode()      {}
+func (cm *CommentLiteral) TokenLiteral() string { return cm.Token.Literal }
+func (cm *CommentLiteral) String() string       { return cm.Token.Literal }

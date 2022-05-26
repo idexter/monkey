@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 
 	"github.com/idexter/monkey/evaluator"
 	"github.com/idexter/monkey/lexer"
@@ -64,3 +65,28 @@ const MONKEY_FACE = `            __,__
         '._ '-=-' _.'
            '-----'
 `
+
+// RunScript runs script from byte array.
+func RunScript(in io.Reader, out io.Writer) {
+	script, err := ioutil.ReadAll(in)
+	if err != nil {
+		fmt.Printf("Unable to read script: %v\n", err)
+		return
+	}
+
+	env := object.NewEnvironment()
+	l := lexer.New(string(script))
+	p := parser.New(l)
+
+	program := p.ParseProgram()
+	if len(p.Errors()) != 0 {
+		printParseErrors(out, p.Errors())
+		return
+	}
+
+	evaluated := evaluator.Eval(program, env)
+	if evaluated != nil {
+		io.WriteString(out, evaluated.Inspect())
+		io.WriteString(out, "\n")
+	}
+}
