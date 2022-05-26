@@ -73,7 +73,7 @@ func (l *Lexer) NextToken() token.Token {
 		tok.Type = token.STRING
 		tok.Literal = l.readString()
 	case '#':
-		tok.Type = token.COMMENT
+		tok.Type = token.SHARP
 		tok.Literal = l.readComment()
 	case 0:
 		tok.Literal = ""

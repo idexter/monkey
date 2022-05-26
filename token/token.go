@@ -6,10 +6,9 @@ const (
 
 	// Identifiers + literals
 
-	IDENT   = "IDENT" // add, foobar, x, y, ...
-	INT     = "INT"   // 123456
-	STRING  = "STRING"
-	COMMENT = "#"
+	IDENT  = "IDENT" // add, foobar, x, y, ...
+	INT    = "INT"   // 123456
+	STRING = "STRING"
 
 	// Operators
 
@@ -31,6 +30,7 @@ const (
 	COMMA     = ","
 	SEMICOLON = ";"
 	COLON     = ":"
+	SHARP     = "#"
 
 	LPAREN = "("
 	RPAREN = ")"

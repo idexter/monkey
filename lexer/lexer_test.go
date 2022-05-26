@@ -124,7 +124,7 @@ if (5 < 10) {
 		{token.COLON, ":"},
 		{token.STRING, "bar"},
 		{token.RBRACE, "}"},
-		{token.COMMENT, " simple comment"},
+		{token.SHARP, " simple comment"},
 		{token.EOF, ""},
 	}
 
