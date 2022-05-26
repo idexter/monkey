@@ -88,10 +88,3 @@ len("Hey Bob, how ya doin?") // 21
 
 puts("Hello World!")
 ```
-
-## TODOs: For the future (maybe)
-
-- [ ] Implement UTF-8 support
-- [ ] Implement float numbers
-- [ ] Implement reading code from files
-- [ ] Implement postfix expressions
