@@ -9,6 +9,20 @@ reading [Writing An Interpreter In Go](https://interpreterbook.com/).
 make
 ```
 
+## Run
+
+You can run Monkey interpreter with REPL:
+
+```bash
+./bin/monkeyc -repl
+```
+
+Also, it's possible to run Monkey script from file:
+
+```bash
+./bin/monkeyc -in ./examples/hello.monkey
+```
+
 ## Examples
 
 ### Variables
